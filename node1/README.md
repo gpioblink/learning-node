@@ -273,4 +273,220 @@ while((result = p.exec(str)) !== null){
 
 - substring
   - 開始位置からの文字数指定で抽出箇所を指定
-  
+
+## Chapter 4
+
+- 関数とは、与えられたパラメータに基づいてなんらかの処理を行い、その結果を返す仕組み。デフォルトの関数のほかにユーザー定義関数も作れる。ユーザー定義関数は４種類の作り方があり、「function命令で定義する」「Functionコンストラクター経由で定義する」「関数リテラル表現で定義する」「アロー関数で定義する」がある。
+
+- 関数名は一般的に「showMessage」のように「動詞＋名詞」で表すこと！！camelCaseな
+
+- function命令の中では関数の中身が１文であってもif/for/whileなど制御命令の中括弧を省略できないので注意。
+
+- 「Functionコンストラクター経由で定義する」ときは`var getTriangle = new Function('base', 'height', 'return base * height /2;');`のように`var 変数名 = new Function(引数,... ,関数の本体);`と書く。仮引数の部分を１つにまとめてもいい。
+
+  - わざわざコンストラクタ経由で記述するメリットは、「引数や関数本体を文字列として定義できる」点。ただし、evalのように乱用すべきではないが。
+
+  - どうしても使用する場合はコストの高い処理のため、whileやfor、頻繁に呼び出される関数の中での使用を避ける。
+
+  - コンストラクタで作ると、Functionコンストラクターの配下の変数は、その宣言場所にかかわらず、常にグローバルスコープとみなされる。関数リテラルでかけばローカル変数をさんしょうするのに。。というわけでやはりFunctionコンストラクターは原則使わないほうがいい。
+
+- JavaScriptの関数は、原則としてfunction命令、または後述する関数リテラル・アロー関数で定義すること。
+
+- 関数リテラルで表現すると、「リテラルとして表現できるし、関数リテラルを変数に代入したり、ある関数の引数として渡したり、はたまた、戻値として関数を返すことすら可能である」
+
+```JavaScript
+var getTriangle = function(base, height){
+    return base * height / 2;
+};
+console.log('三角形の面積：', + getTriangle(5,2));
+```
+
+- function命令と関数リテラルの違いは、「関数を直接定義する」のか、「名前のない関数を定義した上で、変数に格納する」のか。関数リテラルは定義時点で名前をもたないので、、匿名関数とか無名関数と呼ばれる。
+
+- アロー関数で`(引数, ...) => { ...関数の本体... }`は、関数リテラルをより簡潔に記述できる。また、本体が１文のときは関数の本体を囲む{}ブロックが不要で文の戻値がそのまま戻値とみなされるため括弧も省略できる(例:`let getTriangle = (base, height) => base * height / 2;`)。引数が１つのときは括弧を省略できる（０個のときは省略できない）。また、thisの固定もできる。
+
+```JavaScript
+let getTriangle = (base, height) => {
+    return base * height /2;
+};
+console.log('三角形の面積：' + getTriangle(5,2));
+```
+
+- アロー関数の戻値を「オブジェクトリテラル」で返す場合、リテラル全体を括弧でくくらなければならない。(正しく解釈されなくなる)
+
+- JSは文末のセミコロンを自動で補うのでreturn/break/continueの途中で改行してはいけない。文の継続が明らかな箇所でのみ改行すること。
+
+- function命令で構造を宣言した場合はコンパイルするタイミングで関数を登録しているので(静的な構造)、呼び出しコードの後に書いても実行できる。
+
+- JSでは「変数の巻き上げ(hoisting)」という現象がおきる。ローカル変数の確保は「関数全体」で有効なためされているが、この時点ではvarは実行されていないため未定義となっている。これを防ぐために、「ローカル変数は関数の先頭で宣言する」ことを心がける。(これは他の言語でよくある作法の「変数はできるだけ利用する場所の近くで宣言する」に反するので要注意)
+
+```JavaScript
+var scope = 'Global Variable';
+
+function getValue(){
+    console.log(scope); // <- ここはundefinedが出力される？！
+    var scope = 'Local Variable';
+    return scope;
+}
+
+console.log(getValue());
+console.log(scope);
+```
+
+- ES2015以前では、ブロックレベルのスコープは存在しないため以下の様なコードでもエラーは出ない。このような意図しない競合を防ぐために、その下のサンプルのように模擬的なブロックスコープを実現すると良い。
+
+```JavaScript
+if (true) {
+    var i = 5;
+}
+console.log(i);
+```
+
+```JavaScript
+(function(){
+    var i = 5;
+    console.log(i);
+}).call(this); //call(this)とすることで即時関数をその場で実行している
+console.log(i); //変数iはスコープ外なのでエラーとなる
+//自作のアプリ作成等のときは、コード全体を即時関数でくくることで、ライブラリなどアプリ以外のコードと変数名が競合する心配がなくなる。
+```
+
+- ブロックスコープに対応したlet命令もある。コードが複雑になるので即時関数は使わないこと。
+
+- switch文内のlet宣言は注意。条件分岐全体として１つのブロックになっているため、case感で同じ変数をlet宣言するとエラーになる。
+
+- JSは引数の数をチェックしない。もしチェックしたければ、関数配下で「arguments.length」を参照すればよい。
+
+- 引数のデフォルト値を表現するための構文。普通に `if (base === undefined) {base = 1;}`のようにすればよい。無名引数は`arguments[0]`のようにして受け取ることができる。
+
+- `getTriangle({ base:5, height:4 })`のようにして名前付き引数を扱うこともできる。ただし、呼び出し時も`getTriangle({height:4})`のように明示的に名前を指定しなければならない。
+
+- ES2015では、普通な感じでデフォルト値を指定できる。デフォルト値をもった仮引数は、引数リストの末尾で宣言すべき。
+
+- 必須の引数を作る場合にはひと工夫必要。値が指定されないとき、デフォルト値である関数が呼ばれてエラーを発生させる。
+
+```JavaScript
+function required(){
+    throw new Error('引数が不足しています');
+}
+
+function hoge(value = required()){
+    return value;
+}
+hoge(); //Errorになる
+```
+
+- 可変長引数の関数を定義する。
+
+```JavaScript
+function sum(...sums){ //名前が分かりやすい
+    let result = 0;
+    for(let num of nums){ //完全なArrayオブジェクトとして扱える
+        if(typeof num !== 'number') {
+            throw new Error('指定値が数値ではありません：' + num);
+        }
+        result += num;
+    }
+    return result;
+}
+
+try{
+    console.log(sum(1,3,5,7,9));
+}cache(e){
+    window.alert(e.message);
+}
+```
+
+- 「...」演算子で引数の展開。配列を展開して渡したいとき、`Math.max(..[15,-3,78,1])`のようにすると`Math.max(15,-3,78,1)`と展開されて解釈される。
+
+- 名前付き引数を分割代入で`{プロパティ名 = デフォルト値}`で使うことができる。また、分割代入を利用すると次のように個々のプロパティを意識せずにオブジェクトをまるごと渡せる
+
+```JavaScript
+function show({name}){
+    console.log(name);
+}
+
+let member = {
+    mid: 'Y001',
+    name: '山田田老',
+    address: 't-yamada@example.jp'
+};
+
+show(member); //nameだけが表示される
+```
+
+- 複数の戻値を個別の変数に代入できる
+
+```JavaScript
+function getMaxMin(...nums){
+    return [Math.max(...nums), Math.min(...nums)];
+}
+let [max, min] = getMaxMin(10,35,-5,78,0); //これでそれぞれに格納できる
+let [, min2] = getMaxMin(10,35,-5,78,0); //値を捨てることもできる
+```
+
+- 関数を引数や戻り値として扱う高階関数もできる(高階関数は１度しか使わない場合匿名関数で書くとよい)
+
+```JavaScript
+function (data, f){
+    for(var key in data){
+        f(data[key], key);
+    }
+}
+
+var ary = [1,2,4,8,16];
+arrayWalk(ary, function(value, key){
+    console.log(key+':'+value);
+});
+```
+
+- タグ付きテンプレート文字列を使うと、エスケープ処理して表示するなどが簡単になる。タグ付きテンプレート文字列も実態は、単なる関数呼出しで「引数として、分解したテンプレート文字列と、埋め込む変数の可変長引数をとる」「戻値として加工済みの文字列を返す」ものである。
+
+```JavaScript
+function escapeHtml(str){
+    if (!str) {return '';}
+    str = str.replace(/&/g, '&amp;');
+    //ここに様々なエスケープ処理を書く。<>"'くらいは必要かな
+    return str
+}
+function e(templates, ...values){
+   let result = '';
+   for (let i=0, len = templates.length; i<len; i++){
+       result += templates[i] + escapeHtml(values[i]);
+   }
+   return result;
+}
+let name = '<"Namco" &\'NamiNami\'>';
+console.log(e`こんにちは${name}さん！`);
+```
+
+- ローカル変数はActivation Object(Callオブジェクト)と呼ばれ、関数呼出しの都度、内部的に自動生成されるオブジェクト。このオブジェクト群とグローバルオブジェクトがスコープチェーンとなり連結したリストになっている。スコープチェーンを理解することで変数名が重複した変数の解決も規則がはっきりする。
+
+- クロージャは、「ローカル変数を参照している関数内関数」のこと。クロージャごとにちがったスコープチェーンが作られ、一種の記憶領域を提供する。
+
+```JavaScript
+function closure(init){
+    var count = init;
+
+    return function() {
+        return ++counter;
+    }
+}
+var myClosure1 = closure(1);
+var myClosure2 = closure(100);
+console.log(myClosure1());
+console.log(myClosure2());
+console.log(myClosure1());
+console.log(myClosure2());
+```
+
+### クロージャとオブジェクトの対応
+
+- クロージャをくくっている親関数 コンストラクタ
+- クロージャから参照されるローカル変数 プロパティ
+- クロージャ自身 メソッド
+- クロージャの最初の関数呼出し インスタンス化
+- クロージャを格納する変数 インスタンス
+
+こうしてみると、クロージャは「シンプルなオブジェクト」と言い換えられる。
+
