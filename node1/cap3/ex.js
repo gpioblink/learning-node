@@ -1,42 +1,55 @@
-var dat = new Date(2016, 11, 25, 11, 37, 15, 999);
-console.log(dat); //それっぽく出る
-console.log(dat.getFullYear());
-//省略
-console.log(dat.getSeconds());
-console.log(dat.getTime()); // 1970/01/01 00:00:00からの経過ミリ秒
-console.log(dat.getTimezoneOffset); //協定世界時との時差の経過ミリ秒
+//フラグの解説　g/i/m/u
 
-// dat.getUTCFullYear() のように間にUTCをつけると協定時での取得となる。
+// 正規表現の検索
+var p = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/gi;
+var str = 'サポートサイトはhttp://www.wings.msn.to/です。'
+str += 'サンプル紹介サイトHTTP://www.web-deli.com/もよろしく！'
+var result = str.match(p); //正規表現にマッチした文字列を配列として返す。ここではforループでえられた配列の内容を順に出力している
+for(var i = 0, len = result.length; i < len; i++){
+    console.log(result[i]);
+}
 
-var dat2 = new Date(); //デフォルト値として生成時点の値が入っている
-dat2.setFullYear(2017);
-//省略
-dat2.setMilliseconds(513);
+// 正規表現のオプションでマッチング時の挙動を制御する
 
-console.log(dat2.toLocaleString()); //ローカル時の文字列出力
-console.log(dat2.toUTCString()); //UTC時の文字列出力
-console.log(dat2.toDateString());//日付部分を文字列として出力
-console.log(dat2.tiTImeString());//時刻部分を文字列として出力
-console.log(dat2.toLocaleDateString());//地域情報に従って日付部分を文字列として出力
-console.log(dat2.toLocaleTimeString());//地域情報に従って時刻部分を文字列として出力
-console.log(dat2.toJSON()); //JSON文字列として時刻を取得
+//gオプションを外すと。。
+var p = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/g;
+var str = 'サポートサイトはhttp://www.wings.msn.to/です。'
+str += 'サンプル紹介サイトHTTP://www.web-deli.com/もよろしく！'
+var result = str.match(p); //正規表現にマッチした文字列を配列として返す。
+for(var i = 0, len = result.length; i < len; i++){
+    console.log(result[i]); //最初に一致した文字列が見つかったところで終了する。
+    //このときmatchメソッドは「最初に一致した文字列全体とサブマッチ文字列」を配列として返す
+    //サブマッチ文字列は正規表現パターン中の丸かっこで示された部分に合致した部分文字列のこと
+}
 
-console.log(Date.parse('2016/11/05')); //日付文字列を解析しミリ秒にする
-console.log(Date.UTC(2016, 11, 5));
-console.log(Date.now());
+//iオプションを外すと、大文字・小文字の違いを無視しなくなる。
 
-//時刻の加算減算
+//分かりにくいmオプションとは
+var p = /^[0-9]{1,}/gm; //行頭にある１文字以上の数値を検索
+var str = '101匹のワンちゃん。\n7人の小人';
+var result = str.match(p);
+for(var i = 0, len = result.length; i < len; i++){
+    console.log(result[i]);
+}
+//mがないと「101」だけヒットするが、改行後の「7」にもヒットするようになる。
 
-var dat = new Date(2017, 4, 15, 11, 40);
-console.log(dat.toLocaleString());
-dat.setMonth(dat.getMonth() + 3);
-dat.setMonth(dat.getDate() - 20);
-// 日付などの有効範囲を超えた場合でもDateオブジェクトは自動的にさかのぼって正しい日付を作ってくれる
-// 例：来月の０日目＝今月の最終日
+//uフラグをつけると、「叱」などのサロゲートペアを認識できるようになる（任意の１文字としてしっかり認識する）。
 
-//日付・時刻の差分を求める
 
-var dat1 = new Date(2017, 4, 15);
-var dat2 = new Date(2017, 5, 20);
-var diff = (dat2.getTime() - dat1.getTime()) / (1000*60*60*24);
-console.log(diff + '日の差があります！');
+/*
+正規表現で文字列を置き換える
+*/
+
+var p = /(http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?)/g; // $1にマッチング文字列全体をセットするための処置
+var str = 'サポートサイトはhttp://www.wings.msn.to/です。'
+console.log(str.replace(p, '<a href="$1">$1</a>'));
+
+/*
+正規表現で文字列を分割する
+*/
+
+var p = /[\/\.\-]/gi;
+console.log('2016/12/04'.split(p));
+console.log('2016-12-04'.split(p));
+console.log('2016.12.04'.split(p));
+//どんな区切り文字であるかにかかわらず文字列が正しく分割されている
