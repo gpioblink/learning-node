@@ -1,10 +1,6 @@
-var num1 = 255;
-console.log(num1.toString(16));
-console.log(num1.toString(8));
+let sym1 = Symbol('sym');
+let sym2 = Symbol('sym');
 
-var num2 = 123.45678;
-console.log(num2.toExponential(2));
-console.log(num2.toFixed(3));
-console.log(num2.toFixed(7));
-console.log(num2.toPrecision(10));
-console.log(num3.toPrecision(6));
+console.log(typeof sym1);
+console.log(sym1.toString());
+console.log(sym1 === sym2);
