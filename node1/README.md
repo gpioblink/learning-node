@@ -273,3 +273,4 @@ while((result = p.exec(str)) !== null){
 
 - substring
   - 開始位置からの文字数指定で抽出箇所を指定
+  
