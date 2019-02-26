@@ -1,32 +1,26 @@
-let m = new Map();
-m.set('dog', 'ワンちゃん');
-m.set('cat', 'にゃ〜ん');
-m.set('mouse', 'チュウ');
-//or let m = new Map([['dog', 'わんわん'],['cat', 'にゃーん']]);
+let s = new Set();
+s.add(10);
+s.add(5);
+s.add(100);
+s.add(50);
+//同じ値は無視される
+s.add(5);
 
-console.log(m.size);
-console.log(m.get('dog'));
-console.log(m.has('cat'));
+console.log(s.has(100));
+console.log(s.size);
 
-//キーを順番に取得
-for(let key of m.keys()){
-    console.log(key);
+//値を順に取得
+for(let val of s.values()){
+    console.log(val);
 }
 
-//値を順番に取得
-for(let value of m.values()){
-    console.log(value);
+//値を順に取得（うえと同じ）
+for(let  val of s){
+    console.log(val);
 }
 
-//キー・値を順番に取得
-for(let [key,value] of m){
-    console.log(value);
-}
+s.delete(100);
 
-//キーdogを削除
-m.delete('dog');
-console.log(m.size);
-
-m.clear();
-console.log(m.size);
-
+//値を全て廃棄
+s.clear();
+console.log(s.size);
