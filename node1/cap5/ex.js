@@ -1,16 +1,20 @@
-var Member = function(){};
+//継承の練習
 
-Member.prototype.sex = '男';
-var mem1 = new Member();
-var mem2 = new Member();
+var Animal = function(){};
 
-console.log(mem1.sex + '|' + mem2.sex);
-mem2.sex = '女';
-console.log(mem1.sex + '|' + mem2.sex);
+Animal.prototype = {
+    walk: function(){
+        console.log('とことこ');
+    }
+};
 
-delete mem1.sex;
-delete mem2.sex;
-console.log(mem1.sex + '|' + mem2.sex);
-
-//プロトタイプオブジェクトが利用されるのは「値の参照時だけ」
-
+var Dog = function(){
+    Animal.call(this);
+};
+Dog.prototype = new Animal(); //DogオブジェクトのインスタンスからAnimalオブジェクトで定義されたwalkメソッドを呼び出されるようになる
+Dog.prototype.bark = function(){
+    console.log('わんわん');
+}
+var d = new Dog();
+d.walk();
+d.bark();
