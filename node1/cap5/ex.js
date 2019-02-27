@@ -1,12 +1,16 @@
-//配列ライクなオブジェクトを配列に変換する
+var Member = function(){};
 
-function hoge(){
-    // prototypeオブジェクトは、「Arrayオブジェクト配下のメンバを表すためのプロパティ」
-    var args = Array.prototype.slice.call(arguments);
-    //sliceは引数を指定しない場合、もとの配列をそのまま返すのでこの文によってargumentsオブジェクトの内容が配列として得られる
-    console.log(args.join('／'));//argumentsオブジェクトでは使えないjoinができる＝Arrayオブジェクトに変換される
-}
+Member.prototype.sex = '男';
+var mem1 = new Member();
+var mem2 = new Member();
 
-hoge('Angular', 'React', 'BackBone');
+console.log(mem1.sex + '|' + mem2.sex);
+mem2.sex = '女';
+console.log(mem1.sex + '|' + mem2.sex);
 
-//NodeListオブジェクトを配列に変換する場合も使えるよ！
+delete mem1.sex;
+delete mem2.sex;
+console.log(mem1.sex + '|' + mem2.sex);
+
+//プロトタイプオブジェクトが利用されるのは「値の参照時だけ」
+
