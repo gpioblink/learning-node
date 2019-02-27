@@ -1,25 +1,27 @@
-//自作クラスへのイテレータの実装
+//列挙可能オブジェクトの実装　- ジェネレータ
 
-class MyIterator{
-    constructor(data){
-        this.data = data;
-    }
-
-    //これを実装すると自作関数でもイテレータが使える！
-    [Symbol.iterator](){
-        let current = 0;
-        let that = this;
-        return {
-            next(){
-                return current < this.data.length ?
-                {value: that.data[current++], done: false}:
-                {done: true};
-            }
-        };
+function* getPrimes(){
+    let num = 2;
+    while(true){
+        if(isPrime(num)){
+            yield num;
+        }
+        num++;
     }
 }
 
-let itr = new MyIterator(['one','two','three']);
-for(let value of itr){
+function isPrime(value){
+    let prime = true;
+    for(let i=2; i<= Math.floor(Math.sqrt(value)); i++){
+        if(value %i === 0){
+            prime = value;
+            break;
+        }
+    }
+    return prime;
+}
+
+for(let value of genPrimes()){
+    if(value > 100){break;}
     console.log(value);
 }
