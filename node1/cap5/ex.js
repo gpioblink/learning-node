@@ -1,27 +1,19 @@
-//列挙可能オブジェクトの実装　- ジェネレータ
+//自作クラスへのジェネレータの実装
 
-function* getPrimes(){
-    let num = 2;
-    while(true){
-        if(isPrime(num)){
-            yield num;
+class MyIterator{
+    constructor(data){
+        this.data = data;
+        this[Symbol.iterator] = function*(){
+            let current = 0;
+            let that = this;
+            while(current < that.data.length){
+                yield that.data[current++];
+            }
         }
-        num++;
     }
 }
 
-function isPrime(value){
-    let prime = true;
-    for(let i=2; i<= Math.floor(Math.sqrt(value)); i++){
-        if(value %i === 0){
-            prime = value;
-            break;
-        }
-    }
-    return prime;
-}
-
-for(let value of genPrimes()){
-    if(value > 100){break;}
+let itr = new MyIterator(['one','two','three']);
+for(let value of itr){
     console.log(value);
 }
