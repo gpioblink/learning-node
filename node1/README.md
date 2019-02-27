@@ -490,3 +490,255 @@ console.log(myClosure2());
 
 こうしてみると、クロージャは「シンプルなオブジェクト」と言い換えられる。
 
+## Chapter 5
+
+- 旧JSには「クラス」ではなく「プロトタイプ」がある。プロトタイプとは「より縛りの弱いクラスのようなもの」である。
+
+- 最もシンプルなクラスを定義する。`var Member = function() {};`「変数Memberに対して、空の関数リテラルを代入したもの」そして、`var mem = new Member();`このようにしてnew演算子でインスタンス化する。
+
+- JavaScriptでは関数(Functionオブジェクト)にクラスとしての役割を与えている。
+
+- アロー関数ではコンストラクタは定義できない。ES2015ではclass命令を使うべき。
+
+- JSの世界では、同一のクラスを元に生成されたインスタンスであっても、それぞれが持つメンバは同一であるとは限らない。インスタンスごとにメンバの追加や削除ができてしまう。（より縛りのやわいクラス）
+
+- ↑ちなみにオブジェクトの追加削除をされたくない場合は、コンストラクタの末尾に`Object.seal(this);`なんかをつければよい。（thisはコンストラクタの文脈に置いてはコンストラクタによって生成されるインスタンスを表す）
+
+- JavaScriptのthisは、呼び出す場所、呼び出しの方法によって中身の変化する不思議な変数である。
+
+- call/applyメソッド`func.call(that [,arg1 [,arg2[,...]]])` `func.apply(that [,args])`ここでfunc:関数オブジェクト、that:関数の中でthisキーワードが示すもの、arg1,arg2...:関数に渡す引数、that:関数の中でthisキーワードが示すもの、args:関数に渡す引数(配列)
+
+- call/applyメソッドを使うことでthisキーワードが示すオブジェクトを切り替えることができる。引数thatにそれぞれ異なるオブジェクトを渡すことで、hoge関数配下のthisの内容(ここでは出力されるthis.xの値)が変化している。引数thatにnullを渡すと、暗黙的にグローバルオブジェクトが渡されたものとみなされる。
+
+- 配列ライクなオブジェクトを配列にするには、ES2015では`let args = Array.form(arguments)`でいけるようになった！
+
+- JSの構造上、関数がコンストラクタの役割を持っているので、コンストラクタを関数としても呼び出せてしまう。これをふせぐために、以下のようにする
+
+```JavaScript
+var Member = function(firstName, lastName){
+    if(!(this instanceof Member)){
+        //instanceof演算子はオブジェクトが指定されたクラスのインスタンスであるかを判定する
+        return new Member(firstName,lastName);
+    }
+    this.firstName = firstName;
+    //...
+}
+```
+
+- コンストラクタによるメソッドの追加は、「メソッドの数に比例してメモリを消費する」問題がある。いちいちインスタンス化のたびにすべてのメソッドをコピーするのは無駄。
+
+- メソッドはプロトタイプで宣言する。「オブジェクトをインスタンス化した場合、インスタンスは元となるオブジェクトに属するprototypeオブジェクトに対しって暗黙的な参照を持つことになる」
+
+```JavaScript
+var Member = function(firstName, lastName){
+    this.firstName = firstName;
+    this.lastName = lastName;
+};
+
+Member.prototype.getName = function(){
+    return this.lastName + ' ' + this.firstName;
+};
+```
+
+- Javascriptの世界には「クラス」という抽象的な設計図が存在しない。JSの世界にあるのはあくまで実体化されたオブジェクトだけで、新しいオブジェクトを生成するにもオブジェクトが元になっている。そして新しいオブジェクトを作るための雛形が「プロトタイプ」という特別なオブジェクトである。(プロトタイプベースのオブジェクト指向)
+
+- プロトタイプオブジェクトを利用することで、メモリの使用量を節減（挙動は、まずインスタンス側に要求されたメンバが存在しないか確認し、存在しない場合は暗黙の参照をたどってプロトタイプオブジェクトを検索）でき、メンバの追加や変更をインスタンスがリアルタイムに認識できる。つまり、インスタンスを生成した後にメソッドを追加できる
+
+- 暗黙の参照とはいうもの、プロトタイプオブジェクトが利用されるのは「値の参照時だけ」！
+
+- プロパティの宣言はコンストラクタで、メソッドの宣言はプロトタイプでやること！
+
+- インスタンス側でのメンバーの追加や削除と言った操作が、プロトタイプオブジェクトにまで影響を及ぼすことはない。ちなみに`delete Member.prototype.sex`のように削除することもできるが、全てのインスタンスのsexプロパティが削除されてしまうので、注意すること
+
+- インスタンス内のみでメンバを削除したいならundefinedで上書きする手があるが、厳密に削除してないのでfor...inなどでは存在するものとして扱われる。
+
+- プロトタイプを書くときはオブジェクトのリテラル表現を使うこともできる。
+
+```JavaScript
+var Member = function(firstName, lastName){
+    this.firstName = firstName;
+    this.lastName = lastName;
+}
+
+Member.prototype = {
+    getName : function(){
+        return this.lastName + ' ' + this.firstName;
+    },
+    toString : function(){
+        return this.lastName +this.firstName;
+    }
+};
+```
+
+- 静的プロパティや静的メソッドを定義するときは、プロトタイプオブジェクトには登録できない（あくまでインスタンスから暗黙的に参照されることを目的としたオブジェクト）なので、コンストラクター（オブジェクト）に直接追加する`オブジェクト名.プロパティ名 = 値``オブジェクト名.メソッド名 =  function() {/* メソッドの定義 */}`
+
+- プロトタイプ同士を「暗黙の参照」で連結し、互いに継承関係をもたせることができる！(プロトタイプチェーン)。終端には必ず「Object.prototype」がある。
+
+- hasOwnPropertyメソッドは現在のインスタンス自身(連結先のメンバでない)が持つメンバであるかtrue/falseで返す。`obj.hasOwnProrerty(key)`
+
+- 基底クラスのコンストラクタに引数を渡す場合`Animal.call(this, 'hoge', 'foo')`とする。
+
+- 「継承関係は動的に変更可能」ただし、”インスタンスが生成された時点で固定され、その後の変更にかかわらず保存される”
+
+- 元となるコンストラクターを取得するconstractorプロパティ（継承元のクラス判定になる）、元となるコンストラクタを判定するinstanceof演算子、参照しているプロトタイプを確認するisPrototypeOfメソッド、特定のメンバの有無を確認するin演算子がある。
+
+- getterやsetterなどのアクセサーメソッドの実装について、モダンな環境なら、Object.definePropertyを使うのがおすすめ`Object.defineProperty(プロパティを定義するオブジェクトobj,プロパティ名prop,プロパティの構成情報desc)`
+
+- JavaScriptで名前空間は用意されていないので以下のようにして模擬的に実装する。ないときは作りその名前空間へ。名前空間のクラスをインスタンス化するんには名前空間も含んだ完全修飾子でクラス名を指定する必要がある。
+
+```JavaScript
+var Wings = Wings || {};
+
+Wings.Member = function(firstName, lastName){
+    this.firstName = firstName;
+    this.lastName = lastName;
+};
+
+Wings.Member.prototype = {
+    getName : function(){
+        return this.lastName + ' ' + this.firstName;
+    }
+};
+
+var mem = new Wings.Member('あい','うえお');
+console.log(mem.getName);
+```
+
+- 規模が大きい場合にはnamespace作成用の関数を用意しておくと便利
+
+```JavaScript
+function namespace(ns){
+    var names = ns.split('.');
+    var parent = window;
+
+    for(var i=0, len = name.length; i<len; i++){
+        parent[names[i]] = parent[names[i]] || {};
+        parent = parent[names[i]];
+    }
+    return parent;
+}
+
+var my = namespace('Wings.Gihyo.Js.MyApp');
+my.Person = function(){};
+var p = new my.Person();
+console.log(p instanceof Wings.Gihyo.Js.MyApp.Person);//true
+```
+
+- ES2015のクラスでもpublic/protected/privateのようなアクセス修飾子は利用できない
+
+- `const Member = class {...}`の形で匿名クラスもつくれる
+
+- class命令は、プロトタイプベースのオブジェクト指向を覆い包むシンタックスシュガーにすぎない。とはいえ、functionコンストラクタと違い、「（特に対策しなくても）関数としての呼び出しができない」「（特に対策しなくても）定義前のクラスを呼び出すことはできない」
+
+- get/setブロックプロパティの定義もできるよ！
+
+- staticを定義の頭につけることで静的メソッドを定義することもできる、extends Memberみたいなかんじでできる
+
+- 基底クラスのメソッド・コンストラクタを呼び出すにはsuperキーワードが使える
+
+- プロパティの名前と、その値を表した変数名とが同じ場合は値の指定を省略できる`let member = {name, birth};`
+
+- コンストラクタの初期値設定も簡略化できる
+
+```JavaScript
+constructor(firstName, lastName){
+    Object.assign(this, {firstName, lastName});
+}
+```
+
+- プロパティを動的に作成できる
+
+```JavaScript
+let i = 0;
+let member = {
+    name: '山田太郎',
+    birth: new Date(1970, 5, 25),
+    ['memo' ++i]: '正規会員',
+    ['memo' ++i]: '支部会長',
+    ['memo' ++i]: '関東',
+}
+//とするとmemo1,memo2,memo3とかができて入っている
+```
+
+- モジュールには以下のようにアクセスする
+
+```JavaScript
+const AUTHOR = "T. Yamada";
+export class Member {...}
+export class Area {...}
+```
+
+```JavaScript
+import { Member, Area } from './lib/Util'
+var m = new Member('Taro', 'Yamada');
+cosole.log(m.getName());
+```
+
+- import命令には目的に応じてさまざまな書き方が有り「as句で別名をつけモジュール全体の別名`import * as app from './lib/Util'`で指定し、app.~で参照」「`import {Member as MyMember, Area as MyArea} from './lib/Util'`として個々の別名を付与」「モジュールに含まれる要素が１つだけの場合、`export default class`としといて、デフォルトのエクスポートを`import Area from './lib/Area'`としてインポートするとAreaとしてそれにアクセスできるようになる。」これを利用するにはnpmでbrowserifyを-gと--save-devでインストールし、`browserify scripts/main.js`
+
+- プライベートメンバを定義するときモジュール+Symbolを使える。for...inやstringifyからは隠せるが、
+
+```JavaScript
+const SECRET_VALUE = Symbol();
+
+export default class{
+    constructor(secret){
+        this.hoge = 'hoge';
+        this.foo = 'foo';
+        this[SECRET_VALUE] = secret;
+    }
+    checkValue(secret){
+        return this[SECRET_VALUE] === secret;
+    }
+}
+```
+
+```JavaScript
+import MyApp from './lib/MyApp';
+
+let app = new MyApp('secret string');
+
+for (let key in app){
+    console.log(key); //for..inでも列挙されない
+}
+
+console.log(JSON.stringify(app));//jsonにしても見えない
+console.log(app.checkValue('secret string'));//methodからは確認できる
+```
+
+- イテレータのnextメソッドはオブジェクトで、終わりに到達したらdoneを返して、valueで次の要素の値が取得できる。
+
+```JavaScript
+let data_ary = ['one', 'two', 'three'];
+let itr = data_ary[Symbol.iterator]();//Symbol.iteratorから返されたシンボルをキーとして、Arrayオジェクトのメンバーを呼び出しているということ。Array.Symobol.iteratorではない。
+let d;
+whlie(d = itr.next()){
+    if(d.done) {break;}
+    console.log(d.done);
+    console.log(d.value);
+}
+```
+
+- Proxyオブジェクトは、プロパティの設定.取得.削除.for...of/for...inなどの基本的な操作をアプリ独自の動作に差し替えるためのオブジェクト。
+
+```JavaScript
+let data = {red: '赤色', yellow: '黄色'};
+var proxy = new Proxy(obj, {
+    get(target, prop){
+        return prop in target ? target[prop] : '?';
+    }
+});
+console.log(proxy.red);
+console.log(proxy.nothing);
+```
+
+
+### JavaScriptのthisが示す場所
+
+- トップレベル(関数の外) グローバルオブジェクト
+- 関数 グローバルオブジェクト(strictではundefined)
+- call/applyメソッド(関数が提供するメンバ、その関数を呼び出す)  引数で指定されたオブジェクト
+- イベントリスナー イベントの発生元
+- コンストラクター 生成したインスタンス
+- メソッド 呼び出し元のオブジェクト(=レシーバーオブジェクト)
+
