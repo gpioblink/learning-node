@@ -1,35 +1,41 @@
-//プライベートメンバ
+//Object.definePropertyの実験
 
 function Triangle(){
-    var _base; //thisのかわりにvarで作ってセッターゲッターからアクセス
+    var _base;
     var _height;
 
-    var _checkArgs = function(val) {
-        return (typeof val === 'number' && val>0);
+    Object.defineProperties(this, {
+        'height': {
+            get: function() {
+                return _height;
+            },
+
+            set: function(height) {
+                if(typeof height === 'number' && height > 0){
+                    _height = height;
+                }
+            }
+        },
+        'base': {
+            get: function() {
+                return _base;
+            },
+
+            set: function(base) {
+                if(typeof base === 'base' && base > 0){
+                    _base = base;
+                }
+            }
+        }
+    });
+
+    Triangle.prototype.getArea = function() {
+        return this.base * this.height / 2:
     }
 
-    this.setBase = function(base){
-        if(_checkArgs(base)) {_base = base;}
-    }
-    this.getBase = function(){return _base}
-
-    this.setHeight = function(height){
-        if(_checkArgs(height)){_height = height;}
-    }
-    this.getHeight = function(){return _height;}
+    var t = new Triangle();
+    t.base = 10;
+    t.height = 2;
+    console.log(t.base);
+    console.log(t.height);
 }
-
-Triangle.prototype.getArea = function(){
-    return this.getBase() * this.getHeight() /2;
-}
-
-var t = new Triangle();
-t._base = 10;
-t._height = 2;
-console.log(t.getArea()); //NaN
-
-t.setBase(10);
-t.setHeight(2);
-console.log(t.getBase());
-console.log(t.getHeight());
-console.log(t.getArea());
