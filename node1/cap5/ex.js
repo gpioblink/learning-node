@@ -1,15 +1,12 @@
-//コンストラクタに初期化処理を記述する
+//配列ライクなオブジェクトを配列に変換する
 
-var Member = function(firstName, lastName){
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.getName = function() {
-        return this.lastName + ' ' + this.firstName; 
-    };
-};
+function hoge(){
+    // prototypeオブジェクトは、「Arrayオブジェクト配下のメンバを表すためのプロパティ」
+    var args = Array.prototype.slice.call(arguments);
+    //sliceは引数を指定しない場合、もとの配列をそのまま返すのでこの文によってargumentsオブジェクトの内容が配列として得られる
+    console.log(args.join('／'));//argumentsオブジェクトでは使えないjoinができる＝Arrayオブジェクトに変換される
+}
 
-var mem = new Member('祥寛', '山田');
-console.log(mem.getName());
+hoge('Angular', 'React', 'BackBone');
 
-var mem2 = new Member('ひとみ', '菅野');
-console.log(mem2.getName());
+//NodeListオブジェクトを配列に変換する場合も使えるよ！
