@@ -6,23 +6,28 @@
     </head>
     <body>
         <form>
-            <label for="food">一番好きな食べ物？</label>
-            <select id="food">
-                <option value="ラーメン">ラーメン</option>
-                <option value="餃子">餃子</option>
-                <option value="焼き肉">焼き肉</option>
-            </select>
-            <input type="submit" value="送信">
+            好きな食べ物？
+            <lavel><input type="checkbox" name="food" value="ラーメン" />ラーメン</lavel>
+            <lavel><input type="checkbox" name="food" value="味噌汁" />味噌汁</lavel>
+            <lavel><input type="checkbox" name="food" value="餃子" />餃子</lavel>
+            <lavel><input type="checkbox" name="food" value="焼き肉" />焼き肉</lavel>
+            <input type="button" value="送信" id='btn' /><!-- submitだとページ変わるからbuttonがいいぞー -->
         </form>
         <script type="text/javascript">
-        var s = document.getElementById('food');
-        var opts = s.childNodes
-        for (var i=0, lens = opts.length; i<len; i++){
-            var opt = opts.item(i);
-            if(opt.nodeType === 1){
-                console.log(opt.value);
-            }
-        }
+        document.addEventListener('DOMContentLoaded', function(){
+            document.getElementById('btn').addEventListener('click', function(){
+                var result = [];
+                var foods = document.getElementsByName('food');
+
+                for(var i = 0, len = foods.length; i <len; i++){
+                    var food = foods.item(i);
+                    if(food.checked){
+                        result.push(food.value);
+                    }
+                }
+                window.alert(result.toString());
+            }, false);
+        },false)
         </script>
     </body>
 </html>
