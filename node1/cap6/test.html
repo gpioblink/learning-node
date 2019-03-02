@@ -7,14 +7,15 @@
     <body>
         <form>
             好きな食べ物？
-            <lavel><input type="checkbox" name="food" value="ラーメン" />ラーメン</lavel>
-            <lavel><input type="checkbox" name="food" value="味噌汁" />味噌汁</lavel>
-            <lavel><input type="checkbox" name="food" value="餃子" />餃子</lavel>
-            <lavel><input type="checkbox" name="food" value="焼き肉" />焼き肉</lavel>
+            <lavel><input type="radio" name="food" value="ラーメン" />ラーメン</lavel>
+            <lavel><input type="radio" name="food" value="味噌汁" />味噌汁</lavel>
+            <lavel><input type="radio" name="food" value="餃子" />餃子</lavel>
+            <lavel><input type="radio" name="food" value="焼き肉" />焼き肉</lavel>
             <input type="button" value="送信" id='btn' /><!-- submitだとページ変わるからbuttonがいいぞー -->
         </form>
         <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function(){
+
             document.getElementById('btn').addEventListener('click', function(){
                 var result = [];
                 var foods = document.getElementsByName('food');
