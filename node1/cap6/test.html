@@ -15,18 +15,17 @@
         </form>
         <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function(){
-
-            document.getElementById('btn').addEventListener('click', function(){
-                var result = [];
+            var findYourFood = function(){
                 var foods = document.getElementsByName('food');
-
                 for(var i = 0, len = foods.length; i <len; i++){
                     var food = foods.item(i);
                     if(food.checked){
-                        result.push(food.value);
+                        return food.value;
                     }
                 }
-                window.alert(result.toString());
+            }
+            document.getElementById('btn').addEventListener('click', function(){
+                window.alert(findYourFood());
             }, false);
         },false)
         </script>
