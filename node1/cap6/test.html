@@ -5,26 +5,42 @@
         <title>JavaScript開発入門</title>
     </head>
     <body>
-        <ul id="list"></ul>
+        <ul id="list">
+            <li><a href="JavaScript:void(0)" data-isbn="978-4-7981-3547-2">そら</a></li>
+            <li><a href="JavaScript:void(0)" data-isbn="978-4-7741-8030-4">うみ</a></li>
+            <li><a href="JavaScript:void(0)" data-isbn="978-4-7981-4402-3">やま</a></li>
+            <li><a href="JavaScript:void(0)" data-isbn="978-4-8222-9644-5">かわ</a></li>
+        </ul>
+        <input id="del" type="button" value="削除" disabled />
+        <div id="pic"></div>
     </body>
     <script>
         document.addEventListener('DOMContentLoaded', function(){
-            var books = [
-                { title: '独習PHP', price: 3200},
-                { title: 'Javaリファレンス', price: 4321},
-                { title: 'Kotlin入門', price: 1334}
-            ];
             var list = document.getElementById('list');
-            var frag = document.createDocumentFragment();
+            var pic = document.getElementById('pic');
+            var del = document.getElementById('del');
 
-            for(var i=0, len=books.length; i<len; i++){
-                var b = books[i];
-                var li = document.createElement('li');
-                var text = document.createTextNode(b.title +':' + b.price +'yen');
-                li.appendChild(text);
-                frag.appendChild(li);
-            }
-            document.getElementById('list').appendChild(frag);
+            list.addEventListener('click', function(e){
+                var isbn = e.target.getAttribute('data-isbn');
+                if(isbn) {
+                    var img = document.createElement('img');
+                    img.src = 'http://www.wings.msn.to/books/'+isbn+'/'+isbn+'.jpg';
+                    img.alt = e.innerHTML;
+                    img.height = 150;
+                    img.width = 108;
+                    if(pic.getElementsByTagName('img').length > 0){
+                        pic.replaceChild(img, pic.lastChild);
+                    }else{
+                        del.disabled = false;
+                        pic.appendChild(img);
+                    }
+                }
+            },false);
+
+            del.addEventListener('click', function(e){
+                pic.removeChild(pic.lastChild);
+                del.disabled = true;
+            },false);
         },false)
     </script>
 </html>
