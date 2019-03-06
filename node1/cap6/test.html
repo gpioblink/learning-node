@@ -9,18 +9,20 @@
             <label for="file">ファイル：</label>
             <input id="file" name="file" type="file" multiple />
         </form>
+        <hr />
+        <img id="result" />
         <script>
             window.addEventListener('DOMContentLoaded', function(){
                 document.getElementById("file").addEventListener('change', function(e){
-                    var inputs = document.getElementById("file").files;
-                    for(var i=0, len=inputs.length; i<len; i++){
-                        var input = inputs[i];
-                        //Fileオブジェクトの主なプロパティ
-                        console.log(input.name);//ファイル名
-                        console.log(input.type);//コンテンツタイプ
-                        console.log(input.size /1024 +'KB');//サイズ（バイト単位）
-                        console.log(input.lastModifiedDate);//最終更新日
-                    }
+                    var input = document.getElementById("file").files[0];
+                    var reader = new FileReader();
+                    reader.addEventListener('load', function(){
+                        document.getElementById("result").src = reader.result;
+                    }, true);
+                    reader.addEventListener('error', function(){
+                        console.log(reader.error.message);
+                    }, true);
+                    reader.readAsDataURL(input);
                 }, true); //captureの向き。詳細はもう少し読み進めれば分かるはず
             });
         </script>
