@@ -5,42 +5,16 @@
         <title>JavaScript開発入門</title>
     </head>
     <body>
-        <ul id="list">
-            <li><a href="JavaScript:void(0)" data-isbn="978-4-7981-3547-2">そら</a></li>
-            <li><a href="JavaScript:void(0)" data-isbn="978-4-7741-8030-4">うみ</a></li>
-            <li><a href="JavaScript:void(0)" data-isbn="978-4-7981-4402-3">やま</a></li>
-            <li><a href="JavaScript:void(0)" data-isbn="978-4-8222-9644-5">かわ</a></li>
-        </ul>
-        <input id="del" type="button" value="削除" disabled />
-        <div id="pic"></div>
+        <div id="elem">マウスポインタを乗せると色が代わります</div>
     </body>
     <script>
         document.addEventListener('DOMContentLoaded', function(){
-            var list = document.getElementById('list');
-            var pic = document.getElementById('pic');
-            var del = document.getElementById('del');
-
-            list.addEventListener('click', function(e){
-                var isbn = e.target.getAttribute('data-isbn');
-                if(isbn) {
-                    var img = document.createElement('img');
-                    img.src = 'http://www.wings.msn.to/books/'+isbn+'/'+isbn+'.jpg';
-                    img.alt = e.innerHTML;
-                    img.height = 150;
-                    img.width = 108;
-                    if(pic.getElementsByTagName('img').length > 0){
-                        pic.replaceChild(img, pic.lastChild);
-                    }else{
-                        del.disabled = false;
-                        pic.appendChild(img);
-                    }
-                }
-            },false);
-
-            del.addEventListener('click', function(e){
-                pic.removeChild(pic.lastChild);
-                del.disabled = true;
-            },false);
+            elem.addEventListener('mouseover', function(){
+                this.style.backgroundColor = 'Yellow';
+            }, false);
+            elem.addEventListener('mouseout', function(){
+                this.style.backgroundColor = '';
+            });
         },false)
     </script>
 </html>
