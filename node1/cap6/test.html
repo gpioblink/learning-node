@@ -6,28 +6,23 @@
     </head>
     <body>
         <form>
-            好きな食べ物？
-            <lavel><input type="radio" name="food" value="ラーメン" />ラーメン</lavel>
-            <lavel><input type="radio" name="food" value="味噌汁" />味噌汁</lavel>
-            <lavel><input type="radio" name="food" value="餃子" />餃子</lavel>
-            <lavel><input type="radio" name="food" value="焼き肉" />焼き肉</lavel>
-            <input type="button" value="送信" id='btn' /><!-- submitだとページ変わるからbuttonがいいぞー -->
+            <label for="file">ファイル：</label>
+            <input id="file" name="file" type="file" multiple />
         </form>
-        <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function(){
-            var findYourFood = function(){
-                var foods = document.getElementsByName('food');
-                for(var i = 0, len = foods.length; i <len; i++){
-                    var food = foods.item(i);
-                    if(food.checked){
-                        return food.value;
+        <script>
+            window.addEventListener('DOMContentLoaded', function(){
+                document.getElementById("file").addEventListener('change', function(e){
+                    var inputs = document.getElementById("file").files;
+                    for(var i=0, len=inputs.length; i<len; i++){
+                        var input = inputs[i];
+                        //Fileオブジェクトの主なプロパティ
+                        console.log(input.name);//ファイル名
+                        console.log(input.type);//コンテンツタイプ
+                        console.log(input.size /1024 +'KB');//サイズ（バイト単位）
+                        console.log(input.lastModifiedDate);//最終更新日
                     }
-                }
-            }
-            document.getElementById('btn').addEventListener('click', function(){
-                window.alert(findYourFood());
-            }, false);
-        },false)
+                }, true); //captureの向き。詳細はもう少し読み進めれば分かるはず
+            });
         </script>
     </body>
 </html>
