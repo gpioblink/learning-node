@@ -5,40 +5,26 @@
         <title>JavaScript開発入門</title>
     </head>
     <body>
-        <form>
-            <div>
-                <label for="name">サイト名：</label><br />
-                <input id="name" name="name" type="text" size="30" />
-            </div>
-            <div>
-                <label for="url">URL：</label><br />
-                <input id="url" name="url" type="url" size="50" />
-            </div>
-            <div>
-                <input id="btn" type="button" value="追加" />
-            </div>
-        </form>
+        <ul id="list"></ul>
     </body>
-    <div id="list"></div>
     <script>
         document.addEventListener('DOMContentLoaded', function(){
-            document.getElementById('btn').addEventListener('click', function(){
-                var name = document.getElementById('name');
-                var url = document.getElementById('url');
+            var books = [
+                { title: '独習PHP', price: 3200},
+                { title: 'Javaリファレンス', price: 4321},
+                { title: 'Kotlin入門', price: 1334}
+            ];
+            var list = document.getElementById('list');
+            var frag = document.createDocumentFragment();
 
-                //Make an 'a' element
-                var anchor = document.createElement('a');
-                // Add an option
-                anchor.href = url.value;
-                //Generate text node
-                var text = document.createTextNode(name.value);
-                anchor.appendChild(text);
-
-                var br = document.createElement('br');
-                var list = document.getElementById('list');
-                list.appendChild(anchor);
-                list.appendChild(br);
-            },false);
+            for(var i=0, len=books.length; i<len; i++){
+                var b = books[i];
+                var li = document.createElement('li');
+                var text = document.createTextNode(b.title +':' + b.price +'yen');
+                li.appendChild(text);
+                frag.appendChild(li);
+            }
+            document.getElementById('list').appendChild(frag);
         },false)
     </script>
 </html>
