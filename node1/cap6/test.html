@@ -5,16 +5,29 @@
         <title>JavaScript開発入門</title>
     </head>
     <body>
-        <div id="elem">マウスポインタを乗せると色が代わります</div>
+        <div id="elem" class="line">クリックすると色が代わります</div>
     </body>
+    <style>
+        .highlight{
+            background-color: Yellow;
+        }
+        .line{
+            border: 1px solid Red;
+        }
+    </style>
     <script>
         document.addEventListener('DOMContentLoaded', function(){
-            elem.addEventListener('mouseover', function(){
-                this.style.backgroundColor = 'Yellow';
-            }, false);
-            elem.addEventListener('mouseout', function(){
-                this.style.backgroundColor = '';
-            });
+            var elem = document.getElementById('elem');
+            elem.addEventListener('click', function(){
+                var classes = this.className.split(' ');
+                var index = classes.indexOf('highlight');
+                if(index === -1){
+                    classes.push('highlight');
+                }else{
+                    classes.splice(index,1);
+                }
+                this.className = classes.join(' ');
+            },false);
         },false)
     </script>
 </html>
