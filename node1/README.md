@@ -732,7 +732,6 @@ console.log(proxy.red);
 console.log(proxy.nothing);
 ```
 
-
 ### JavaScriptのthisが示す場所
 
 - トップレベル(関数の外) グローバルオブジェクト
@@ -742,3 +741,214 @@ console.log(proxy.nothing);
 - コンストラクター 生成したインスタンス
 - メソッド 呼び出し元のオブジェクト(=レシーバーオブジェクト)
 
+## Chapter 6
+
+- DOMはW3Cが標準化していて現在は「Level4」まである。
+
+- API (Application Programming Interface, 関数やオブジェクトの集合)
+
+- `getElementById(id)`を利用すれば、指定されたid値を持つ要素をElementオブジェクトに返せる
+
+- aやpなどタグ名でみる場合は`getElementsByTagName(name)`。要素の集合が返るので`document.getElementsByTagName('a').item(i).href`のように「`item(i)`」を使って指定するか、「`namedItem(name)`」を使ってidやname属性が一致する要素を取得すればいい。指定は`list[i].href`のようにブラケット構文で置き換えも可能
+
+- inputやselectなどのフォーム要素にアクセスするために`document.getElementsByName(name)`も使えるが、ラジオボタンやチェックボックスなどname属性が等しい要素群を取得する場合に限られるだろう。
+
+- ByTagNameはHTMLCollectionオブジェクト、ByNameはNodeListオブジェクトを返す。NodeListではnamedItemメソッドがないので注意
+
+- ByClassNameもあり、指定時に「clazz1 clazz2」のようにすれば複数のクラス名を列挙できる。戻値はHTMLコレクション
+
+- めんどうなら`document.querySelectorAll(selector)`でCSSの記法で書けばよい。戻値はNodeList。最初の１つだけをElementオブジェクトでほしいならAllを付けずに使えばいい。
+
+- getXXXやqueryXXXで取得した要素の近接ノードはノードウォーキングでゲットしよう！
+
+- NodeListに含まれるのは要素だけではない。タグの間にある改行や空白もテキストノードとみなされる。取り出したノードが要素ノードか調べるには、nodeTypeの戻り値が1であることを確認すればよい。ちなみに、テキストノードは3、コメントノードは8などと決まっている。
+
+- 子要素リストを取得する別の方法として、firstChild/nextSiblingプロパティがある。これらを使用すれば、以下のように書き換えることもできる。
+
+```JavaScript
+var child = s.firstChild;
+
+whil(child){
+    if(child.nodeType === 1){
+        console.log(child.value);
+    }
+    child = child.nextSibling;
+}
+```
+
+- 要素のみを取得したい場合は、以下のようにすればnodeTypeによる判定をしなくて済む
+
+```JavaScript
+var child = s.firstElementChild;
+
+while(child){
+    console.log(child.value);
+    child = nextElementSibling;
+}
+```
+
+- イベントをトリガーにして処理を実行することをイベントドリブンモデル（イベント駆動型モデル）という。よくあるイベント、abort(img読み込み中断など),load(body,img),unload,click,dbclick,mousedown,mouseup,mousemove,mouseover,mouseout,mouseenter,mouseleave,contextmenu,keydown,keypress,keyup,change,reset,submit,blur(要素からフォーカスが離れたとき),focus,resize(要素のリサイズ),scroll。
+
+- mouseenter/mouseleaveは対称の要素に出入りしたときだけ発生するが、mousever/mouseoutはその内側の子要素に出入りしたときも発生する違いがある
+
+- イベントハンドラ・リスナで定義する３つ「どの要素で発生した」「どのイベントを」「どのハンドラ・リスナに関連付けるか」
+
+- イベント・リスナに関連付けするための方法３つ(クライアントサイドのJS)「タグ内の属性として宣言する」「要素オブジェクトのプロパティとして宣言する」「addEventListenerメソッドで宣言する」
+
+- `obj.onevent = function() {statements}`で要素オブジェクトのハンドラとして設定する。もちろん匿名関数の代わりに関数名を書いても可能。イベント名は全て小文字。関数名を書く場合、関数オブジェクトの記述であり、呼び出しではないから括弧はつけない
+
+- 実行のタイミングで要素が取得できない場合があるので、基本的には「onload」イベントハンドラの配下に記述する必要がある
+
+- ハンドラとして設定する方法には「同一の要素・イベントに対して複数のイベントハンドラを日も付けられない」という問題があるので、イベントリスナがある。`elem.addEventListener(type, listener, capture)` (elem:要素オブジェクト、type:イベントの種類、listener:イベントに応じて実行すべき処理、capture:イベントの方向)
+
+```HTML
+<input id="btn" type="button" value="ダイアログ表示" />
+```
+
+```JavaScript
+document.addEventListener('DOMContentLoaded', function(){ //DOMContentLoadedリスナはコンテンツ本体がロードで実行。画像もロードされた時点なのはonloadイベントハンドラ
+    document.getElementById('btn').addEventListener('click',function(){
+        window.alert('ボタンが押されました');
+    },false);
+},false);
+```
+
+- ページの初期化処理はDOMContentLoadedイベントリスナで表すのが基本
+
+- 多くの属性は「要素ノードの同名プロパティ」としてアクセス可能。ただしclass属性はclassNameプロパティなど一部例外があるので注意。違いを意識したくないなら`elem.getAttribute(name)`や`elem.setAttribute(name,value)`を使う。この方法は文字列で指定するので、動的に変更できる。
+
+- `var atrs = elem.attributes;`で特定の要素ノードに含まれる属性リストをNamedNodeMapオブジェクトHTMLCollectionに似たオブジェクト,item(i)が使える)で得ることが出来る。取り出したノードにはname/valueプロパティでアクセス可能。
+
+- NamedNodeMapはインデックスでアクセス可能だが、あくまで列挙しやすくするためであり、HTMLCollectionやNodeListのようにノードの順序は保証していないので注意。
+
+- テキストを取得・設定するには、テキストをHTML文字列として認識するinnerHTMLプロパティかtextContentプロパティを利用できる。取得のときは、textContentの場合、子要素からテキストだけ抽出して連結したものを返す。
+
+- innerHTMLプロパティにユーザーからなど外部からの入力値を入れるとXSSの原因となるのでしない。もし入力値をもとにHTMLを組み立てたい場合はcreateElement/createTextNodeメソッドを利用すること。
+
+- フォーム`<textarea>`、`<select>`以外の要素は`<input type="XXX">`のXXXでdatetime-localやweek、month、color、timeなどデータの型に応じて用意されている。
+
+- input要素はvalueプロパティにアクセスするだけで値を取得・設定できる
+
+- ラジオボタン・チェックボックスでは、valueプロパティは選択の有無にかかわらずvalue属性で指定された値を返すので、checkedプロパティがtrueかみればよい
+
+- 複数選択できるリストボックスでは、select要素は以下のoption要素を取得してoptionsプロパティにアクセスすればよい。
+
+- fileを読み込むときは、FileReaderオブジェクトを使う。`reader.readAsText(fileObj, [, charset])`。`reader.addEvetListender('error', func, true)`で失敗時の動作を決められる。
+
+- 画像など、読み込んだファイルを「Data URL」として利用するには、`reader.readAsDataURL(input);`を利用すればよい。
+
+- submit()フォームの内容サブミット, reset()フォームの内容リセット, focus()要素にフォーカス移動, blur()要素からフォーカス外す, select()セレクトを選択状態に, disabled要素の入力・選択の禁止, form要素が属するフォームを取得, validity要素の検証結果を取得
+
+- DOMノードを追加するには次の３ステップ。「要素・テキストノードを作成する」「ノード同士を組み立てる」「属性ノードを追加する」
+
+- createXxxxxメソッドには、多くのメソッドがある。createElement,createAttribute,createTextNode,createCDATASection,createComment,createEntityReference,createProcessingInstruction,createDocumentFragment
+
+- appendChildをinsertBeforeとすると、appendする順番を決められる。最後に入れるなら第二引数はnull
+
+- 属性はノードではないので専用の、createAttributeメソッドや、`要素オブジェクト.removeAttribute(属性名)`を使う
+
+- createTextNodeでは、htmlタグが入力されてもプレーンなテキストで返される
+
+- オーバーヘッドを防ぐために、documentFragmentで書き換えるものをまとめてから一気に描画する方法もある。
+
+- ノードの置き換えは`elem.replaceChild(after,before)`、ノードの削除は`elem.removeChild(node)`、ある子要素のノードは「lastChild」や「firstChild」で取得できる
+
+- `data-xxxxx`属性はアプリ開発者が自由に値を設定できる特別な値。主にスクリプトで利用するための。
+
+- `JavaScript:void(0)`これは、何も返さない(voidは何も返さないことを示す演算子)のでよく使われる
+
+- HTMLCollection/NodeListは生きたオブジェクトなので、繰り返し処理してノードを増やしていく場合は、.lengthが無限に大きくなる。防ぐために、`for(var i=0, len=li.length; i<len; i++){`初期化式でlengthのプロパティをlenに格納したりして回避しよう。ノードを増やさない場合でも、lengthプロパティのアクセスはオーバーヘッドの処理をしないから。
+
+- `querySelectorAll`メソッドの戻値はNodeListオブジェクトとして返すがこれは、生きておらず「静的なNodeList」と呼ばれる。
+
+- styleプロパティは`elem.style.prop[=value]`
+
+- JavascriptでCSSのプロパティを指定してやるときは、「ハイフンを取り除いた上で２単語以降の頭文字は大文字」とする。ただしfloatはstyleFloatとする。
+
+- `elem.className = clazz`プロパティを使うことで、外部のスタイルシートを適用する。clazzにはスタイルクラスの名前を入れればいい。複数指定するときはスペース区切りでいい
+
+- スタイルクラスを脱着するときも、classNameを切り替えればいい。ただし、複数のクラスが適用されて居る場合はsplitで空白区切りの文字列を分割してから比較しないといけない
+
+- スタイルクラスをより簡単に操作できるclassListプロパティもある。length,item(index),contains(clazz),add(clazz),remove(clazz),toggle(clazz)などが用意されている
+
+- イベントハンドラーを削除したいときはonxxxxメソッドに対しnullを指定すれば良い。
+
+- イベントリスナーを削除したいときには`removeEventListener(type, listener, capture)`メソッドを指定すればよい。削除時に削除するリスナーを指定んしないといけないので匿名関数は無理。
+
+- イベントに関わる情報を取得したいときはイベントオブジェクトを利用できる。慣例としてeまたはevを使う。
+
+- イベントオブジェクトにはタイムスタンプも入っている。
+
+- イベントは下位ノードから上位ノードに向かって該当するものがある場合は全て複数個発生する。
+
+- `e.stopPropagation()`では上位・下位要素の伝達をキャンセルするのに対して、同じ位にいる要素も含めてその場で伝達をキャンセルするには`e.stopImmediatePropagation()`メソッドを利用する。
+
+- 伝達captureは「キャプチャーフェーズ(windowオブジェクトから下位要素)」「ターゲットフェーズ(イベントの発生元)」「パブリングフェーズ(下位要素から上位要素)」の順で行われる。通常はパブリングフェーズの段階で下から上に発生されるが、addEventListenerの第３引数でtrueを指定することによりキャプチャーフェーズの段階で上から下に発生される。
+
+- ブラウザ標準で決められたページを移動するなどの動作をキャンセルするには`e.preventDefault()`を使用する。
+
+- イベントハンドラーでキャンセルしたいときは`<div oncontextmenu="return false;">...</div>`などとしてコンテキストメニューをキャンセルできる。
+
+- イベントリスナー・イベントハンドラーは以下のthisキーワードは「イベントの発生元(要素)」を表すものである。しかし、リスナーの中のメソッドを呼ぶ場合など、thisが期待するイベントの発生元でなくなることがある。その場合、`.addEventListener('click',data.show,false)`みたいなやつをFunctionオブジェクトのbindメソッドで書き換えることで`.addEventListener('click',data.show.bind(data),false)`期待するオブジェクトを紐付けられる`func.bind(that[,arg1,arg2,...])`thatは関数の中でthisキーワードが示すもの、arg1...は関数に渡す引数
+
+- addEventListenerには関数(Functionオブジェクト)の他に、handleEventメソッドを持っているオブジェクト(EventListenerオブジェクトという)を指定することもできる。
+
+- アロー関数でthisを固定することも出来る。アロー関数では、thisはアロー関数自身が宣言された場所によって決まる。
+
+```JavaScript
+elem.addEventListener('click', () => {
+    this.count++;
+    this.show();
+},false);
+```
+
+### JSで使えるCSSのスタイルプロパティで主なやつ
+
+- 枠線
+  - border：枠線全体width,style,colorの順に指定
+  - borderXxxx：XxxxにはTop,Buttom,Left,Rightのいずれかを指定)
+  - border(Xxxx)Color：枠線の色。カラーコードまたはカラー名
+  - border(Xxxx)Style：枠線のスタイル。none/dotted/dashed/solid/double/groove/ridge/inset/outsetから指定
+  - border(Xxxx)Width：幅
+
+- 背景 background(color,image,repeat,atachment,positionを順に指定)、backgroundAttachment(表示方法scroll,fixed)、backgroundColor、backgroundImage(url)、backgroundPosition(top,center,buttom,left,right,単位付きの値)、backgroundRepeat(繰り返し表示repeat,no-repeat,repeat-x,repeat-y)
+
+- テキスト表示 direction表示方向(ltr,rtl,inherit)、clear回り込みなくす(none,left,right,both)、styleFloat回り込み位置(none,left,right)、lineHeight行の高さ(normal,値,単位のついた値)、textAlign行揃え(left,right,center,justify,inherit)、textDecoration装飾(none,underline,overline,line-through)、textIndent字下げ、verticalAlign垂直位置(auto,baseline,top,buttom,middle,super,sub,text-top,text-buttom)
+
+- フォント font(フォント全般fontStyle,fontVariant,fontWeight,fontSize,lineHeight,fontFamilyの順に指定)、fontFamily書体、fontSizeサイズ、fontStyle(normal,italic,oblique)スタイル、fontWeight太さ(normal,bold,bolder,lighter,100~900の値)、color
+
+- 表示と配置
+  - position 配置方式absolute,fixed,relative,static
+  - top/left/right/bottom positionで指定された上・左・右下をどれだけ離すか
+  - clip 表示範囲auto,値
+  - display (none,block,inline,list-item,inline-table,tablerow,table-row-group,table-header-group,marker,runin,compact,table,table-column,table-column-group,table-caption,table-cell)
+  - height,widthボックスの高さ
+  - zindex positionの重ね合わせ順序(auto,値)
+  - overflow auto,visible,hidden,scroll
+  - visibility visible,hidden,inherit
+
+- リスト
+  - listStyleリスト全般type/position/image、listStyleImage行頭のマーク画像none/url、listStylePosition行頭マークのスタイルnone/disc/circle/square/decimal/decimal-leading-zero,lower-roman,upper-roman,lowergreek,lower-alpha,lower-latin,upper-latinなど
+
+- 余白 margin(Xxxxx)マージン paddingパディング
+
+- カーソル cursorカーソルの形状 auto/crosshair/default/hand/help/pointer/movetext/waitなど
+
+### 代表的なCSS記法で知らなかったやつ
+
+- selector1, selector2, selector3
+  - いずれかのセレクターに合致するもの全て取得
+- parent > child
+  - parentの子要素childを取得
+- ancestor descendent
+  - ancestorの子孫要素descendentを全て取得
+- prev + next
+  - prev直後のnext要素を取得
+- prev ~ siblings
+  - prev要素移行のsiblings兄弟要素を取得
+- [attr]
+  - 指定した属性を持つ要素を取得
+- [attr = value]
+  - 属性がvalueに等しい値を取得(^=から始まる、$=で終わる、*=を含む)(例：img[src$=".gif"])
+- [selector1][selector2][selector3]
+  - 複数の属性フィルタすべてにマッチする要素取得(例：img[srt][alt])
