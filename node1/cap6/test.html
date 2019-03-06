@@ -6,25 +6,39 @@
     </head>
     <body>
         <form>
-            <label for="file">ファイル：</label>
-            <input id="file" name="file" type="file" multiple />
+            <div>
+                <label for="name">サイト名：</label><br />
+                <input id="name" name="name" type="text" size="30" />
+            </div>
+            <div>
+                <label for="url">URL：</label><br />
+                <input id="url" name="url" type="url" size="50" />
+            </div>
+            <div>
+                <input id="btn" type="button" value="追加" />
+            </div>
         </form>
-        <hr />
-        <img id="result" />
-        <script>
-            window.addEventListener('DOMContentLoaded', function(){
-                document.getElementById("file").addEventListener('change', function(e){
-                    var input = document.getElementById("file").files[0];
-                    var reader = new FileReader();
-                    reader.addEventListener('load', function(){
-                        document.getElementById("result").src = reader.result;
-                    }, true);
-                    reader.addEventListener('error', function(){
-                        console.log(reader.error.message);
-                    }, true);
-                    reader.readAsDataURL(input);
-                }, true); //captureの向き。詳細はもう少し読み進めれば分かるはず
-            });
-        </script>
     </body>
+    <div id="list"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            document.getElementById('btn').addEventListener('click', function(){
+                var name = document.getElementById('name');
+                var url = document.getElementById('url');
+
+                //Make an 'a' element
+                var anchor = document.createElement('a');
+                // Add an option
+                anchor.href = url.value;
+                //Generate text node
+                var text = document.createTextNode(name.value);
+                anchor.appendChild(text);
+
+                var br = document.createElement('br');
+                var list = document.getElementById('list');
+                list.appendChild(anchor);
+                list.appendChild(br);
+            },false);
+        },false)
+    </script>
 </html>
