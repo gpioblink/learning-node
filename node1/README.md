@@ -952,3 +952,264 @@ elem.addEventListener('click', () => {
   - 属性がvalueに等しい値を取得(^=から始まる、$=で終わる、*=を含む)(例：img[src$=".gif"])
 - [selector1][selector2][selector3]
   - 複数の属性フィルタすべてにマッチする要素取得(例：img[srt][alt])
+
+## Chapter 7
+
+- ブラウザオブジェクトは、ブラウザ機能を集めたオブジェクト群の総称。クライアントサイドJavaScriptが起動される段階で自動的に生成される。
+
+- windowオブジェクトの配下にはdocument,history,location,navigatorといったプロパティがある。
+
+- windowオブジェクトを経由することでDocument、History、Locationオブジェクトを取得できる。
+
+- `location.reload();`または`window.location.reload();`ただし、冗長になるだけで意味はない。また、このときlocationはオブジェクト名ではなくプロパティ名を表す。locationオブジェクトと表記されることもあるが、あくまで「Locationオブジェクトを参照するプロパティ」。
+
+- 確認ダイアログはconfirmメソッドで利用できる。alertとちがって、OKとキャンセルボタンがあり、true/falseが返る
+
+- 一定時間ごとになんらかの処理を行いたいときは、setInterval,setTimeoutメソッドを使う。setInterval,setTimeoutはどちらもタイマーを一意に識別するためのid値を返すので、それをclearIntervalやclearTimeoutでキャンセルすることによりタイマーを破棄することができる。
+
+- setTimeout/setIntervalメソッドの注意点３つ「引数funcに文字列を使わない」「指定した時間に実行されるわけではない。キューに実行すべき処理が残っていると待たないと終わるまで待つ挙動」「引数durをゼロにすると非同期となるので重い処理を中に書くと幸せになれたりする」
+
+- ただしタイマーには4msという最小呼び出し間隔があるので、非同期処理のときに0msタイマーを使用したい場合はpostMessageメソッドで代用するのが適切である。
+
+- locationオブジェクトで利用できる主なプロパティ・メソッド hashアンカー名(#〜)、hostホスト(ホスト名＋ポート番号。80の場合はポート番号は省略)、hostNameホスト名、hrefリンク先、pathname読専、portポート番号読専、protocolプロトコル名読専(http:)、reload()現在のページを再読込、replace(url)指定ページurlに移動
+
+- location.hrefを使うとブラウザに移動の履歴が残るが、残したくないときはlocation.replace()メソッドを利用すれば良い
+
+- 履歴に沿ってページを前後に移動するhistoryオブジェクトは、`history.forward()`や`history.back()`で前後に行けて、`history.go(-3)`で指定されたページだけ進んだり戻ったり出来る
+
+- JavaScriptでページ更新した場合、そのままではページの状態を保持することはできない。pushStateメソッド（HistoryAPI）を使うとJavaScriptによる操作をブラウザーの履歴に残すことができる。`history.pushState(data,title[,url]);`例：`history.pushState(count, null, '/js/hogehoge/' + count)`。戻るボタンでページの状態を戻す
+
+- userAgentはいろいろ複雑なので、Fileなど使えるか怪しい機能がある場合は、「機能テスト（そのオブジェクトを呼んでみてundefinedでないか）」をして確認するのがよい。ユーザーエージェントは特定のブラウザやバージョンに依存するバグを回避するために使うべき
+
+- `console.log(str)`以外にもinfo,warn,errorがあり、見やすくなる。
+
+- printfみたいに`console.log(format,args)`があって`%s`で文字列、`%d,%i`で整数、`%f`で浮動小数点、`%o,%O`でJSオブジェクトを出力できる
+
+- console.group(label)でログをグループ化できる。groupCollapsedならグループが折り畳まれた状態で出力される。
+
+```JavaScript
+console.log('上位グループ');
+console.group('下位グループ');
+console.log('実行結果');
+console.groupEnd();
+```
+
+- console.count([label])なら、その行が何回呼び出されたかをログに出力できる。値が初期化されることはない。
+
+- timeとtimeEndで時間計測もできる。`assert(exp,message)`メソッドで条件がfalseの場合だけログを出力することも出来る。
+
+- console.dirを使うと、elementオブジェクトをHTML形式ではなく、オブジェクトツリーとして表示できる。他にも、表示が少し見やすくなる。
+
+- Cookieは容量が小さく、JavaSctiptから利用するのが難しいため、Storageオブジェクト(Web Storage)を使うのがおすすめ。キーとデータの組み合わせで保存するので、Key-Value型ストアと呼ばれる
+
+- ウィンドウ・タブ間でデータ共有ができないセッションストレージと、オリジン単位でデータ管理できるローカルストレージがある。
+
+```JavaScript
+var storage = localStorage; // sessionStorageにしたいときはここを変えるだけ
+// storage.key storage['key']でアクセスするか、storage.getItem('キー名') storage.setItem('キー名','値')でもアクセスできる
+```
+
+- 既存のデータを削除するには`storage.removeItem('fruit1');'``delete storage.fruit1;``delete storage['fruit1']`のどれでもいい。無条件に全て削除するには`storage.clear()`を使用すれば良い。
+
+- 全てのデータを取り出すにはkeyメソッドが使える`storage.key(idx)`を利用してキーを取得しながらやればいい。
+
+```JavaScript
+var storage = localStorage;
+for(var i=0, len=storage.length; i<len; i++){
+    var k = storage.key(i);
+    var v = storage[k];
+    console.log(k + ' : ' + v);
+}
+```
+
+- ストレージにオブジェクトを保存・取得するには、内部的にtoStringで文字列化されてしまうので、`storage.setItem('apple', JSON.stringify(apple))``var data = JSON.parse(storage.getItem('apple'));`のようにすればよい。変換後の値はオブジェクトリテラルに似た記法の文字列で、ストレージに保存できる。
+
+- ローカルストレージでは、オリジン単位でデータの管理をしている。ストレージで名前の衝突を防ぐには、１つのオリジンで複数のアプリが動作している場合に、名前衝突の危険を防ぐため１つのアプリで使うデータは１つのオブジェクトに収めるようにするとよい。
+
+```JavaScript
+//MyStorageクラスの例
+
+var MyStorage = function(app) {
+    this.app = app;//アプリ名
+    this.storage = localStorage;
+    this.data = JSON.parse(this.storage[this.app] || '{}'); //ストレージから呼んだオブジェクト。データがない場合は空のオブジェクトを生成すれば良い。
+};
+
+MyStorage.prototype = {
+    getItem: function(key){
+        return this.data[key]:
+    },
+    setItem: function(key,value){
+        return this.data[key] = value;
+    },
+    save: function(){
+        this.storage[this.app] = JSON.stringify(this.data);
+    }
+};
+```
+
+- ストレージの変更を監視するには`window.addEventListener('click', function(e){});`で、keyに変更されたキー、oldValueに変更前の値、newValueに変更後の値、urlに変更発生元のページ、storageAreaに影響を受けたストレージ(localStorage, sessionStorageオブジェクト)
+
+- xhrはXMLHttpRequestの略
+
+- Ajaxアプリの作り方の手順３ステップ。「XMLHttpRequestオブジェクトを生成」「サーバー通信時の処理を定義」「非同期通信を開始」
+
+- 「R response 応答本体」「R readyState HTTP通信の状態」「R responseText 応答本体のプレーンテキスト」「responseType 応答の型」「responseXML 応答をXMLDocumentオブジェクト取得」「R status HTTPステータスコード取得」「R statusText HTTPステータスの詳細メッセージ取得」「timeout」「withCredentialsクロスオリジン通信の際に認証情報の送信をするか」「onreadystatechange通信状態変化で呼び出されるイベントハンドラ」「ontimeoutタイムアウトで発生するイベントハンドラ」「abort() 現在の非同期通信を中止」「RS getAllResponseHeaders()受信したHTTP応答ヘッダ全ての取得」「RS getResponseHeader(header) 指定したHTTP応答ヘッダ取得」「open(...) HTTPリクエスト初期化」「send(body)  HTTPリクエスト送信」「setRequestHeader(header,value) リクエスト時に送信するヘッダ追加」(R読み取りのみ、Ssendの成功時のみ有効)
+
+- XMLHttpRequestという名前だが、通信に使用するデータ形式は、XML,HTTPに限定されるわけではない。クライアント、サーバ間の汎用的な通信が出来る。
+
+- onreadystatechangeイベントハンドラーの一般的な処理の流れ
+
+```JavaScript
+document.addEventListener('DOMContentLoaded', function(){
+    document.getElementById('btn').addEventListener('click', function(){
+        var result = document.getElementById('result');
+        var xhr = new  XMLHttpRequest();
+
+        xhr.onreadystatechange = function(){
+            if(xhr.readyState == 4){ // 0未初期化,1ロードチュウ,2ロード済み,3一部の応答を取得,4全てのデータ取得済み
+                if(xhr.status == 200){
+                    result.textContent = xhr.responseText;
+                }else{
+                    result.textContent = 'サーバーエラーが発生しました';
+                }
+            }else{
+                result.textContent = '通信チュウ。。。';//エンドユーザは通信中かワカラナイため、進捗メッセージを示すのは開発者の責任
+            }
+        }
+
+        xhr.open('GET', 'ajax.php?name=' + encodeURIComponent(document.getElementById('name').value), true);
+        xhr.send(null);
+    }, false);
+}, false);
+```
+
+- XMLHttpRequestの主なイベントはloadstart,progress,timeout,abort,load,error,loadend。上のハンドラ使うより書きやすくなるね！`xhr.addEventListener('loadstart', function(){ ...}, false)`
+
+- サーバーとの通信を開始する`xhr.open(method(GET,POST,PUT,DELETEなどのHTTPメソッド), url(アクセス先のURL) [,async(非同期通信かどうか) [,user(認証時のユーザー名) [,passwd(認証時のパスワード)]]])`
+
+- 数百バイト以内のデータを送信するくらいならGETでいいが、それ以上大きくする場合はPOSTを利用する。`xhr.open('POST','hello.php',true);xhr.setRequestHeader('content-type', 'application/x-www-from-urlencoded;charset=UTF-8');xhr.send('name=' + encodeURIComponent(document.getElementById('name').value));`POSTを利用する場合は２点、「Content-Typeヘッダーに`application/x-www-form-urlencoded;charset=UTF-8`を指定する」「要求データはsendメソッドの引数として指定する(あらかじめencodeURLComponent関数でエンコードしておくこと)」
+
+- JSON (JavaScript Object Notation)
+
+- 破片使わなくても、リストに内包されるような使い方でいけるんだ！liのcreateElementで十分
+
+- JSON.parseを使うとxhr.resposeTextのデータをJavaScriptオブジェクトに変換できる。
+
+- JSONP(JSON with Padding)が外部サーバからでもクロスオリジンの制限を受けないのは、「script要素であれば外部サーバからもスクリプトを読み込めるから」である。外部サーバで生成したスクリプトによって、クライアント側の関数呼出しをする。
+
+```JavaScript
+document.getElementById('btn').addEventListener('click', function(){
+    var url = 'http://b.hatena.ne.jp/entry/jsonlite/?callback=show&url=' + encodeURIComponent(document.getElementById('url').value);
+
+    var scr = document.createElement('script');
+    scr.src = url;
+    document.getElementsByTagName('body').item(0).appendChild(scr);
+},false);
+
+function show(data){
+    ...JavaScriptオブジェクト型のdataを加工するための処理...
+}
+```
+
+- クロスドキュメントメッセージングによるクロスオリジン通信を行えば、異なるオリジンで提供されているガジェットをiframeで取り込んだり、メインアプリから操作したり、ガジェットの処理結果を受け取ったりすることができる。`other.postMessage(message, target) other:送信先ウィンドウ、message:送信するメッセージ、target:送信先ウィンドウの生成元オリジン`、postMessageから得たメッセージを取得するときは、messageイベントリスナーを使う。受信したデータはe.dataで取得できる。
+
+- インラインフレームからメッセージを本体に返送するときは、イベントオブジェクトeのsourceプロパティで、メッセージを送信してきた親ウィンドウを取得できるので、あとはpostMessageを呼び出すだけ。もしmessageイベントリスナーの外から応答したい場合には、`parent.postMessage(current, origin)`というふうにparentプロパティ使えばいい。
+
+```JavaScript
+document.addEventListener('DOMContentLoaded', function(){
+    window.addEventListener('message', function(e){
+        //時刻を返送
+        var current = new Date();
+        e.source.postMessage(current, origin);
+    },false);
+},false);
+```
+
+- 上で返された結果をメインウィンドウで受信するにはmessageイベントリスナで実装するだけ。
+
+```JavaScript
+window.addEventListener('message', function(e){
+    if(e.origin !== target) {return;}
+    console.log(e.data);
+},false);
+```
+
+- コールバック地獄を回避するために生まれてきたのがPromiseオブジェクト(JavaScriptの標準組み込みオブジェクトだからバックエンドでも使えるよ)。Promiseオブジェクトを利用することで同期処理のように１本道でコードを記述できるようになる。`first().then(second).then(third).then(fourth)`
+
+```JavaScript
+function asyncProcess(value){
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if(value) {
+                resolve(`入力値：${value}`);
+            }else{
+                reject('入力は空です');
+            }
+        },500);
+    }):
+}
+
+asyncxProcess('トクジロウ').then(
+    response => {
+        console.log(response);
+        return asyncProcess('ニンサブロウ');
+    }
+).then(
+    response => {
+        console.log(response);
+    },
+    error => {
+        console.log(`エラー：${error}`);
+    }
+);
+```
+
+- Promiseオブジェクトを利用する場合、まずは非同期処理を関数としてまとめる。asyncxProcess関数が戻り値として返すのがPromiseオブジェクト。`new Promise((resolve,reject) => {statements})`resolve処理の成功を通知するための関数、reject処理の失敗を通知するための関数、statements処理本体。
+
+- `promise.then(success, failure)`promise:Promiseオブジェクト、success:成功コールバック関数(resolveに寄って呼び出し)、failure:失敗コールバック関数となる。
+
+- 複数の非同期処理が成功した場合にコールバックするallメソッドもある。`Promise.all(監視するPromiseオブジェクトの配列promises)`戻り値（thanにくる値）が配列として渡されるので注意。
+
+- Promise.raceで、非同期処理のいずれか１つが最初に完了したところで完了コールバックを呼び出すPromise.raceメソッドもある。この場合、書式はallと同じだが、戻値は早く終わったものの１つが帰ってくる
+
+- バックグラウンドでJavaScriptのコードを実行できる「Web Worker」がある。thread(糸)を複数より合わせて１本の丈夫なヒモ(機能)を実現する。シングルスレッドに対して、複数のスレッドが動作する処理のことをマルチスレッド処理という。
+
+- setTimeoutはいったん作業が脇に置かれているだけで、setTimeoutは結局１つのスレッド上で順番に動いているにすぎない。だからこれはあくまで模擬的な並列処理だった。
+
+- ワーカーを実装するには、ワーカーをメインのjsとは別に準備することになる。ワーカーを呼び出すには`new Worker(ワーカーのパスpath)`
+
+```JavaScript worker.js
+self.addEventListener('message', function(e){ //messageイベントはメインスレッドからメッセージ(ワーカーを起動した)タイミングで発生する。
+    var count = 0;
+    for(var i=1, len = e.data.target; i<len; i++){ //受け取った値target/xにもとづいて、1〜targetの範囲でxの倍数がいくつあるかをカウントする
+        if(i % e.data.x === 0) {count++:}
+    }
+    postMessage(count); //得られた個数はpostMessageでメインスレッドに応答する。
+});
+```
+
+```Javascript worker_client.js
+document.addEventListener('DOMContentLoaded',function(){
+    document.getElementById('btn').addEventListener('click', function(){
+        var worker = new Worker('scripts/worker.js');
+        worker.postMessage({ //任意の形で値を渡せるが、一般的にはパラメータ：値とする
+            'target': document.getElementById('target').value,
+            'x': document.getElementById('x').value
+        });
+        document.getElementById('x').textContent = '計算チュウ。。。';
+
+        worker.addEventListener('message', function(e)){
+            document.getElementById('result').textContent = e.data;
+        }, false);
+
+        worker.addEventListener('error', function(e){ //例外のeではmessage,filename,linenoプロパティなどで取得できる
+            document.getElementById('result').textContent = e.message;
+        },false);
+    },false);
+},false);
+
+
+//実行中のワーカーをメインスレッドから停止するときworker.terminate();
+//ワーカー自身が自分を終了するときself.close();
+```
