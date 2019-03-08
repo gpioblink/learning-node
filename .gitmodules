@@ -1,0 +1,3 @@
+[submodule "node1/cap8/jasmine"]
+	path = node1/cap8/jasmine
+	url = git@github.com:jasmine/jasmine.git
