@@ -5,22 +5,27 @@
         <title>JavaScript開発入門</title>
     </head>
     <body>
-        <input id="btn" type="button" value="タイマー停止" />
+        <form>
+            <input id="message" type="text" size="80" />
+            <input id="btn" type="button" value="送信" />
+        </form>
+        <iframe id="frame" src="http://www.wings.msn.to/cross_other.html"></iframe>
         <div id="result"></div>
     </body>
     <script>
         document.addEventListener('DOMContentLoaded', function(){
-            var timer = window.setInterval(
-                function(){
-                    var dat = new Date();
-                    document.getElementById('result').textContent = dat.toLocaleTimeString();
-                }
-            ,5000);
+            var target = 'http://www.wings.msn.to';
 
-            document.getElementById('btn').addEventListener('click', function(){
-                window.clearInterval(timer);
-            });
+            document.getElementById('btn').addEventListener('click',function(){
+                document.getElementById('frame').contentWindow.postMessage(
+                    document.getElementById('message').value, target);
+            },false);
 
+            window.addEventListener('message', function(e){
+                var origin = 'http://localhost';
+                if(e.origin !== origin) {return;}
+                document.getElementById('result').textContent = e.data;
+            },false);
         },false);
     </script>
 </html>
