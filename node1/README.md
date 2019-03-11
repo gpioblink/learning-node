@@ -1213,3 +1213,41 @@ document.addEventListener('DOMContentLoaded',function(){
 //実行中のワーカーをメインスレッドから停止するときworker.terminate();
 //ワーカー自身が自分を終了するときself.close();
 ```
+
+## Chapter 8
+
+- Jasmineなどのテスティングフレームワークは主に「単体テスト(ユニットテスト)」の部分を支援するために考案された仕組み。
+
+- Jasmineでテストをするときは、テスト対象との対応関係がわかりやすくなるよう、原則として`テスト対象のファイル名_spec.js`とする。
+
+- Jasmineではテスト検証に`expect(result_value).matcher(expect_value)`result_valueテスト対象のコード(式)、matcher検証メソッド、expect_value期待する値の３点を使う。アサーションメソッド(結果確認のためのメソッド)Matcherは標準で次のようなものがある。`toBe(expect), toEqual(expect), toMatch(regex), toBeDefined(), toBeNull(), toBeTruthy(), toBeFalsy(), toContain(expect), toBeLessThan(compare), toBeGreaterThan(compare), toBeCloseTo(compare,precision), toThrow()`。Matcherはライブラリを使用することで拡張もできる。
+
+- 否定を表現したいならnotメソッドを使い`expect(1 + 1).not.toEquel(2);`のようにする。
+
+### MDNによる主なコーディング規則
+
+- 1行あたりの桁数は80文字以下に収めること
+- カンマ・セミコロンの後方にはスペースを入れること
+- 関数やオブジェクトなどの定義ブロックの前後は空行で区切ること
+
+- インデントはスペース２個で表現すること
+- 2項演算子は空白で区切ること
+- カンマ・セミコロン・キーワードの後方には空白を含めること
+
+- 変数関数は先頭小文字camelCase、コンストラクタ・クラス名は先頭大文字CamelCase、定数名は大文字アンダースコア
+- プライベートメンバーは「_」で始め、イベントハンドラー関数は「on」で始める
+
+- すべての変数は宣言、初期化。変数宣言の重複は厳禁
+- 配列、オブジェクト生成はリテラル構文で行う
+- 真偽値をtrue/falseで比較しない
+
+### Google Javascript Style Guideによる主な規則
+
+- jsファイル名は小文字で統一
+- セミコロンは省略しない
+- 文字列は「"」より「'」で区切る
+- 基本データ型のラッパーオブジェクトは使わない
+- グローバルレベルの名前は最小限に
+- ブロックを表す{...}の前に改行は入れない
+- with/eval命令は利用しない
+- for...in命令は連想配列・ハッシュのみで
