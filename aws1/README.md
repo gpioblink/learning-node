@@ -135,3 +135,26 @@
 - Lambda関数はどれも粒度の細かいサービス、単一責任原則を念頭に置いて書く。つまり、入力と出力を明確に定義し、副作用を最小限に抑える。
 
 - Pipes and filtersパターンを使うときは、次の４つのルールに従って、一連のパイプラインに分解することを検討する。「単一責任原則に従った関数を書くようにすること」「関数を冪等(同じ入力に対してはいつも同じ出力が生成される)にすること」「関数のインターフェイスを明確に定義すること。入力と出力を明確に指定する」「ブラックボックスをつくること。関数のコンシューマーは、関数がどのような仕組みになっているかを知らなくても使い方がわかり、どのような出力が得られるかわかっていないといけない」
+
+## AWSのインストール・セットアップの大まかな手順
+
+1. npm, AWS CLIをインストール
+1. IAMユーザ・ロール、動画を格納するためのS3パケット、動画をトランスコードするためのErastic Transcoderパイプラインを作成
+  
+  - IAM(Identity and Access Management)の設定はこんな感じ
+    ```
+    AWS Access Key ID [None]: AKI***************
+    AWS Secret Access Key [None]: **************************
+    Default region name [None]: us-east-1
+    Default output format [None]: json
+    ```
+
+  - 作成したIAMにはユーザーアクセス権限を設定し、Lambda関数をデプロイできるようにする。GetFunctions,UpdateFunctionCode,UpdateFunctionConfigurationを許可すれば良い。 
+
+  - S3バケットは、アップロード用のserverless-video-uploadとトランスコート保管用のserverless-video-transcodedの２つを作る。（バケット名はAmazon のグローバルで一意でないといけない。）
+
+  - 将来のLambda関数のためにIAMロールを作る。Lambdaサービスを選択して、AWSLambdaExecute(Lambda関数にAmazonS3,AWS CloudWatchとのやりとりを認める)とAmazonElasticTranscoder_JobsSubmitter(Lambda関数がAmazonElasticTranscoderに新しいトランスコードジョブを実行できるようにする)の2つのポリシーをあタッチする。
+
+  - 最初のLambda関数を作成する。関数名はtranscode-videoで、ロールは先程作成したlambda-s3-execution-roleとする。
+
+  - Amazon Elastic Transcoderを使って、動画を他の形式、ビットレートにトランスコードできるよう、ElasticTranscoderのパイプラインを作る。
