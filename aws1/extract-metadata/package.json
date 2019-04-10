@@ -1,0 +1,19 @@
+{
+  "name": "extract-metadata",
+  "version": "1.0.0",
+  "description": "Extract metadata using ffprobe",
+  "main": "index.js",
+  "scripts": {
+    "test": "run-local-lambda --file index.js --event tests/event.json",
+    "deploy": "aws lambda update-function-code --function-name arn:aws:lambda:us-east-1:646351086568:function:extract-metadata --zip-file fileb://Lambda-Deployment.zip",
+    "predeploy": "zip -r Lambda-Deployment.zip * -x *.zip *.log"
+  },
+  "author": "Peter Sbarski",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "aws-sdk": "^2.431.0"
+  },
+  "devDependencies": {
+    "run-local-lambda": "^1.1.1"
+  }
+}
