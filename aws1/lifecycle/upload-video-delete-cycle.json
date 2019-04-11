@@ -1,0 +1,14 @@
+{
+    "Rules": [
+        {
+            "Filter": {
+
+            },
+            "Status": "Enabled",
+            "Expiration": {
+                "Days": 1
+            },
+            "ID": "delete_transcoded_video_lifecycle"
+        }
+    ]
+}
