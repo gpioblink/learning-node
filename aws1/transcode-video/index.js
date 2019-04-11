@@ -31,6 +31,14 @@ function convertVideo(sourceKey, outputKey, callback){
            {
                Key: outputKey + '-web-720p' + '.mp4',
                PresetId: '1351620000001-100070'
+           },
+           {
+               Key: outputKey + '-hls' + '.m3u8',
+               PresetId: '1351620000001-200010'
+           },
+           {
+            Key: outputKey + '-webm' + '.vp8',
+            PresetId: '1351620000001-100240'
            }
         ]
     };
@@ -59,7 +67,7 @@ exports.handler = function(event, context, callback){}
      var extension = sourceKey.match(/(.+)(\.[^.]+$)/)[2].slice(1);
      console.log('key:', key, sourceKey, outputKey);
 
-     if(sourceKey === "avi" || sourceKey === "mp4" || sourceKey === "mov"){
+     if(extension === "avi" || extension === "mp4" || extension === "mov"){
          convertVideo(sourceKey, outputKey, callback);
      }else{
          deleteObject(sourceBucket, sourceKey, callback);

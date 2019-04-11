@@ -16,7 +16,8 @@
      s3.putObject({
          Bucket: bucket,
          Key: key,
-         Body: body
+         Body: body,
+         ACL: 'public-read'
      },function(error, data){
          if(error){
              callback(error);
