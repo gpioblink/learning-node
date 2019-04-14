@@ -1,4 +1,52 @@
 //今はElemental Cloudのほうがいいかもねー
+
+function saveMetadataToS3(body, bucket, key, callback){
+    console.log('Saving metadata to S3');
+
+    s3.putObject({
+        Bucket: bucket,
+        Key: key + "/" + key + ".original.json",
+        Body: body,
+        ACL: 'public-read'
+    },function(error, data){
+        if(error){
+            callback(error);
+        }
+    });
+}
+
+function extractMetadata(outputBucket, outputKey, localFilename, callback){
+    console.log('Extracting metadata');
+    
+    var cmd = 'bin/ffprobe -v quiet -print_format json -show_format "/tmp/' + localFilename + '"';
+
+    exec(cmd, function(error, stdout, stderr){
+        if(error === null){
+            //var metadataKey = sourceKey.split('.')[0] + '.json';
+            saveMetadataToS3(stdout, outputBucket, outputKey, callback);
+        } else {
+            console.log(stderr);
+            callback(error);
+        }
+    });
+}
+
+function saveFileToFilesystem(sourceBucket, sourceKey, outputBucket, outputKey, callback){
+    console.log('Saving to filesystem');
+
+    var localFilename = sourceKey.split('/').pop();
+    var file = fs. createWriteStream('/tmp/' + localFilename);
+    var stream = s3.getObject({Bucket: sourceBucket, Key: sourceKey}).createReadStream().pipe(file);
+
+    stream.on('error', function(error){
+        callback(error);
+    });
+
+    stream.on('close', function(){
+        extractMetadata(outputBucket, outputKey, localFilename, callback);
+    });
+}
+
 function deleteObject(bucket, key, callback){
     console.log('Deleting not vaild file from S3');
 
@@ -54,16 +102,20 @@ exports.handler = function(event, context, callback){}
 
  var AWS = require('aws-sdk');
  var s3 = new AWS.S3();
-
+ var fs = require('fs');
+ var exec = require('child_process').exec;
+ var crypto = require('crypto'); 
  var elasticTranscoder = new AWS.ElasticTranscoder({
      region: 'us-east-1'
  });
 
  exports.handler = function(event, content, callback){
      var sourceBucket = event.Records[0].s3.bucket.name;
+     var outputBucket = "serverless-video-transcoded-myself";
      var key = event.Records[0].s3.object.key;
      var sourceKey = decodeURIComponent(key.replace(/\+/g," ")); //S3のキー名はURLエンコードされるのででコードが必要
-     var outputKey = sourceKey.match(/(.+)(\.[^.]+$)/)[1]; //拡張子を除去、途中にピリオドがあってもいいように修正 
+     //var outputKey = sourceKey.match(/(.+)(\.[^.]+$)/)[1]; //拡張子を除去、途中にピリオドがあってもいいように修正 
+     var outputKey = crypto.randomBytes(8).toString('hex'); //ランダムな文字列で出力するように変更 
      var extension = sourceKey.match(/(.+)(\.[^.]+$)/)[2].slice(1);
      console.log('key:', key, sourceKey, outputKey);
 
@@ -72,4 +124,5 @@ exports.handler = function(event, context, callback){}
      }else{
          deleteObject(sourceBucket, sourceKey, callback);
      }
+     saveFileToFilesystem(sourceBucket, sourceKey, outputBucket, outputKey, callback);
  };
