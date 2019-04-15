@@ -182,3 +182,7 @@
 - run-local-lambdaを使うことで、イベントをシュミレートして、event、context,callbackをするテストができる。`run-local-lambda --file index.js --event tests/event.json`他に`--file --event --handler --timeout`といった４個の引数を指定可能。これを`npm test`で使えるようにindex.jsのtestなんかにすればいい。これを実行すると、`AccessDeniedException`が出るがlambda-uploadにアクセス権限がないので当然。
 
 - AWS LambdaにAmazon S3を接続するのがはじめてなら、S3のプロパティからイベントを作成しようとしても、アクセス権限エラーが発生する場合がある。その場合はLambdaコンソールでトリガーを生成しないといけない。
+
+- 本番環境（ローカル環境）に異なるアクセス権限が必要な場合は、Lambda関数には別々のロールを作る。
+
+- アップロードしたファイルで古いものを定期的に削除するような場合はs3のLifeCycle機能が使える。s3のバケット管理からGUIで決めることもできる
