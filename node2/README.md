@@ -105,13 +105,13 @@ export class AppComponent {
 
 - 標準では呼び出し元(index.html)のあるフォルダが起点となるが、SystemJSで`baseURL`を設定すると、基底パスを変えることもできる。
 
-## @NgModuleデコレータの主なパラメータで知らなかったやつ
+### @NgModuleデコレータの主なパラメータで知らなかったやつ
 
-declarations 現在のモジュールに属するコンポーネントなど
-bootstrap アプリで最初に起動すべき最上位コンポーネント
-id モジュールのid値
+- declarations 現在のモジュールに属するコンポーネントなど
+- bootstrap アプリで最初に起動すべき最上位コンポーネント
+- id モジュールのid値
 
-## 一般的な命名規則（コンポーネント、ディテクティブ、パイプ、サービス等）
+### 一般的な命名規則（コンポーネント、ディテクティブ、パイプ、サービス等）
 
 - クラス名
   - 「名前＋種類」でUpperCamelCase
@@ -126,16 +126,14 @@ id モジュールのid値
   - friend-list.component.spec.ts
 
 
-## tsconfig.json内のcompilerOptionsに含められるパラメータについて
+### tsconfig.json内のcompilerOptionsに含められるパラメータについて
 
-target  JSのバージョン(es3,es5,es6)
-module  生成するJSモジュールの形式(commonjsなど)
-moduleResolution    モジュールの解決方法(sourceMapなど)
-lib コンパイル時にインクルードされるライブラリ(["es2015","dom"]など)
-experimentalDecorators  デコレータを有効にするか
-noImplicitAny   暗黙的なanyを許容しない
-suppressImplicitAnyIndexErrors  インデックスアクセスでnoImplicitAnyエラー回避
+- target  JSのバージョン(es3,es5,es6)
+- module  生成するJSモジュールの形式(commonjsなど)
+- moduleResolution    モジュールの解決方法(sourceMapなど)
+- lib コンパイル時にインクルードされるライブラリ(["es2015","dom"]など)
+- experimentalDecorators  デコレータを有効にするか
+- noImplicitAny   暗黙的なanyを許容しない
+- suppressImplicitAnyIndexErrors  インデックスアクセスでnoImplicitAnyエラー回避
 
 ※ noImplicitAnyが指定されていても、コード内でany型を明示すれば制約エラーを回避できる。設定を無効にするよりは、これで対処したほうがよい。
-
-
