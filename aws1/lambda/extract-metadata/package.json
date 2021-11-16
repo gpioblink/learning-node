@@ -11,7 +11,7 @@
   "author": "Peter Sbarski",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "aws-sdk": "^2.431.0"
+    "aws-sdk": "^2.814.0"
   },
   "devDependencies": {
     "run-local-lambda": "^1.1.1"
